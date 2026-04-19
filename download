@@ -1,0 +1,220 @@
+import React, { useContext } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { AppContext } from '../context/AppContext';
+
+const EnrolledCoursesScreen = ({ navigation }) => {
+  const { studentData, isDarkTheme } = useContext(AppContext);
+  
+  const courses = studentData.courses || [
+    { id: '1', name: 'Data Structures', timing: 'Monday & Wednesday - 10:00 AM', instructor: 'Dr. Smith', credits: 3, room: 'Room 101' },
+    { id: '2', name: 'Algorithms', timing: 'Tuesday & Thursday - 11:00 AM', instructor: 'Prof. Johnson', credits: 3, room: 'Room 102' },
+    { id: '3', name: 'Database Systems', timing: 'Monday & Wednesday - 2:00 PM', instructor: 'Dr. Williams', credits: 4, room: 'Room 103' },
+    { id: '4', name: 'Web Development', timing: 'Tuesday & Thursday - 3:00 PM', instructor: 'Prof. Brown', credits: 3, room: 'Room 104' },
+    { id: '5', name: 'Operating Systems', timing: 'Friday - 9:00 AM', instructor: 'Dr. Davis', credits: 3, room: 'Room 105' },
+    { id: '6', name: 'Computer Networks', timing: 'Monday - 4:00 PM', instructor: 'Prof. Miller', credits: 3, room: 'Room 106' },
+    { id: '7', name: 'Software Engineering', timing: 'Wednesday - 4:00 PM', instructor: 'Dr. Wilson', credits: 3, room: 'Room 107' },
+  ];
+
+  const totalCredits = courses.reduce((sum, course) => sum + (course.credits || 0), 0);
+
+  const getCourseIcon = (courseName) => {
+    if (courseName.includes('Data')) return 'storage';
+    if (courseName.includes('Algorithm')) return 'account-tree';
+    if (courseName.includes('Database')) return 'database';
+    if (courseName.includes('Web')) return 'language';
+    if (courseName.includes('Operating')) return 'computer';
+    if (courseName.includes('Network')) return 'router';
+    if (courseName.includes('Software')) return 'developer-mode';
+    return 'menu-book';
+  };
+
+  const getColorForCourse = (index) => {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+    return colors[index % colors.length];
+  };
+
+  const CourseCard = ({ course, index }) => (
+    <TouchableOpacity
+      style={[styles.courseCard, isDarkTheme && styles.darkCourseCard]}
+      onPress={() => navigation.navigate('CourseDetail', { course })}
+    >
+      <View style={[styles.cardIcon, { backgroundColor: getColorForCourse(index) + '20' }]}>
+        <Icon name={getCourseIcon(course.name)} size={30} color={getColorForCourse(index)} />
+      </View>
+      <View style={styles.cardContent}>
+        <Text style={[styles.courseName, isDarkTheme && styles.darkText]}>{course.name}</Text>
+        <View style={styles.courseDetail}>
+          <Icon name="schedule" size={14} color="#666" />
+          <Text style={[styles.detailText, isDarkTheme && styles.darkSubText]}>{course.timing}</Text>
+        </View>
+        <View style={styles.courseDetail}>
+          <Icon name="person" size={14} color="#666" />
+          <Text style={[styles.detailText, isDarkTheme && styles.darkSubText]}>{course.instructor}</Text>
+        </View>
+        <View style={styles.courseDetail}>
+          <Icon name="star" size={14} color="#FFD700" />
+          <Text style={[styles.detailText, isDarkTheme && styles.darkSubText]}>Credits: {course.credits}</Text>
+        </View>
+      </View>
+      <Icon name="chevron-right" size={24} color={isDarkTheme ? '#888' : '#999'} />
+    </TouchableOpacity>
+  );
+
+  return (
+    <ScrollView style={[styles.container, isDarkTheme && styles.darkContainer]}>
+      <StatusBar style={isDarkTheme ? 'light' : 'dark'} />
+      
+      <View style={[styles.header, isDarkTheme && styles.darkHeader]}>
+        <View style={styles.headerIconContainer}>
+          <Icon name="menu-book" size={40} color="#113d67ff" />
+        </View>
+        <Text style={[styles.headerTitle, isDarkTheme && styles.darkText]}>
+          Enrolled Courses
+        </Text>
+        <View style={styles.headerStats}>
+          <View style={styles.statItem}>
+            <Icon name="book" size={20} color="#c4c128ff" />
+            <Text style={[styles.statValue, isDarkTheme && styles.darkText]}>{courses.length}</Text>
+            <Text style={[styles.statLabel, isDarkTheme && styles.darkSubText]}>Courses</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Icon name="credit-score" size={20} color="#4CAF50" />
+            <Text style={[styles.statValue, isDarkTheme && styles.darkText]}>{totalCredits}</Text>
+            <Text style={[styles.statLabel, isDarkTheme && styles.darkSubText]}>Total Credits</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.coursesList}>
+        {courses.map((course, index) => (
+          <CourseCard key={course.id} course={course} index={index} />
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
+  header: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    alignItems: 'center',
+  },
+  darkHeader: {
+    backgroundColor: '#1e1e1e',
+    borderBottomColor: '#333',
+  },
+  headerIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 45,
+    backgroundColor: '#7ebdf85d',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  headerStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 10,
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 5,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: '#ddd',
+    marginHorizontal: 10,
+  },
+  darkText: {
+    color: '#fff',
+  },
+  darkSubText: {
+    color: '#aaa',
+  },
+  coursesList: {
+    padding: 15,
+  },
+  courseCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  darkCourseCard: {
+    backgroundColor: '#343333ff',
+  },
+  cardIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  cardContent: {
+    flex: 1,
+  },
+  courseName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  courseDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 3,
+  },
+  detailText: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 5,
+  },
+});
+
+export default EnrolledCoursesScreen;
